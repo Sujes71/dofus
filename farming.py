@@ -2,7 +2,8 @@ import pyautogui as pg
 import time
 from pynput.keyboard import Key
 import keyboard
-import os
+import os, sys
+import threading
 
 
 imageOffSet = 25
@@ -16,25 +17,39 @@ def imageSelector():
             image_list.append(file)
 
 def checkNettle():
-    for image in image_list:
-        try:
-            if keyboard.is_pressed("esc"):
-                break
-            pos = pg.locateOnScreen(path + "./" + image, confidence = 0.58)
-            pg.moveTo(pos[0] + imageOffSet, pos[1]+imageOffSet)
-            pg.click()
-            time.sleep(3)
-           
-            
-        except:
-            print("NO SE HA ENCONTRADO RECURSO")
-            pg.moveTo(500, 0)
+    global stop_threads
+    stop_threads = False
+    while True:
+        if stop_threads:
+            print("Finalizado satisfactoriamente")
+            break
+        else:
+            for image in image_list:
+                try:
+                    pos = pg.locateOnScreen(path + "./" + image, confidence = 0.55)
+                    pg.moveTo(pos[0] + imageOffSet, pos[1]+imageOffSet)
+                    pg.click()
+                    
+                except:
+                    print("NO SE HA ENCONTRADO RECURSO")
+                    pg.moveTo(500, 0)
 
-    time.sleep(0.5)
-
+            time.sleep(0.5)
+    
+def finalize():
+    global stop_threads
+    global end
+    while True:
+        if keyboard.is_pressed("esc"):
+            stop_threads = True
+            break
+        
+         
 imageSelector()
+x = threading.Thread(target=checkNettle)
+y = threading.Thread(target=finalize)
 
-while True:
-    checkNettle()
-    if keyboard.is_pressed("esc"):
-        break
+x.start()
+y.start()  
+   
+   
