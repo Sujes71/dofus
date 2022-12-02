@@ -2,7 +2,7 @@ import pyautogui as pg
 import time
 from pynput.keyboard import Key
 import keyboard
-import os, sys
+import os
 import threading
 
 
@@ -38,7 +38,6 @@ def checkNettle():
     
 def finalize():
     global stop_threads
-    global end
     while True:
         if keyboard.is_pressed("esc"):
             stop_threads = True
