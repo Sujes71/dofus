@@ -2,7 +2,7 @@ import pyautogui as pg
 import time
 from pynput.keyboard import Key
 import keyboard
-import os
+import os, sys
 import threading
 
 
@@ -17,36 +17,70 @@ def imageSelector():
             image_list.append(file)
 
 def checkNettle():
-    global stop_threads
+    global stop_threads, isFight, end
     stop_threads = False
+    isFight = False
+    end = False
+    count = 0
     while True:
         if stop_threads:
-            print("Finalizado satisfactoriamente")
+            pass
+        elif fight():
+            print("Let's Fight!")
+            isFight = True
+        elif end:
+            print("Finalized!")
             break
         else:
             for image in image_list:
-                try:
-                    pos = pg.locateOnScreen(path + "./" + image, confidence = 0.55)
-                    pg.moveTo(pos[0] + imageOffSet, pos[1]+imageOffSet)
+                count += 1
+                pos = pg.locateOnScreen(path + "./" + image, confidence = 0.55)
+                if pos == None:
+                    print("Resources not found!")
+                    continue
+                pg.moveTo(pos[0] + imageOffSet, pos[1]+imageOffSet)
+                pg.click()   
+            if count == len(image_list):
+                count = 0
+                if pg.locateOnScreen( "./Others./fail.png", confidence=0.5) != None:
+                    pg.moveTo(500, 0)
+                if pg.locateOnScreen( "./Others./fail2.png", confidence=0.5) != None:
+                    me = pg.locateOnScreen( "./Others./fail2.png", confidence=0.55)
+                    if me == None:
+                        continue
+                    pg.moveTo(me[0] + imageOffSet, me[1]+imageOffSet - 60)
                     pg.click()
                     
-                except:
-                    print("NO SE HA ENCONTRADO RECURSO")
-                    pg.moveTo(500, 0)
-
-            time.sleep(0.5)
-    
+                    
+def fight():
+    try:
+        if pg.locateOnScreen( "./Others./fight.png") != None:
+            os.startfile('Others\\ring.mp3')
+            return True
+    except:
+        return False
+        
+        
 def finalize():
     global stop_threads
+    global end
     while True:
-        if keyboard.is_pressed("esc"):
+        if keyboard.is_pressed("f2") or isFight :
             stop_threads = True
+        if keyboard.is_pressed("f1"):
+            stop_threads = False
+        if keyboard.is_pressed("esc"):
+            end = True
+            stop_threads = False
             break
+            
         
          
 imageSelector()
 x = threading.Thread(target=checkNettle)
 y = threading.Thread(target=finalize)
+
+time.sleep(5)
 
 x.start()
 y.start()  
