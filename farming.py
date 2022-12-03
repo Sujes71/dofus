@@ -2,7 +2,7 @@ import pyautogui as pg
 import time
 from pynput.keyboard import Key
 import keyboard
-import os, sys
+import os
 import threading
 
 
@@ -44,17 +44,15 @@ def checkNettle():
                 count = 0
                 if pg.locateOnScreen( "./Others./fail.png", confidence=0.5) != None:
                     pg.moveTo(500, 0)
-                if pg.locateOnScreen( "./Others./fail2.png", confidence=0.5) != None:
-                    me = pg.locateOnScreen( "./Others./fail2.png", confidence=0.55)
-                    if me == None:
-                        continue
+                me = pg.locateOnScreen( "./Others./fail2.jpg", confidence=0.55)
+                if me != None:
                     pg.moveTo(me[0] + imageOffSet, me[1]+imageOffSet - 60)
                     pg.click()
                     
                     
 def fight():
     try:
-        if pg.locateOnScreen( "./Others./fight.png") != None:
+        if pg.locateOnScreen( "./Others./fight.png", confidence=0.6) != None:
             os.startfile('Others\\ring.mp3')
             return True
     except:
